@@ -24,7 +24,8 @@ model = dict(
         use_abs_pos_embed=False,
         act_cfg=dict(type='GELU'),
         norm_cfg=backbone_norm_cfg,
-        pretrain_style='official'),
+        #pretrain_style='official'
+        ),
     decode_head=dict(
         type='UPerHead',
         in_channels=[96, 192, 384, 768],

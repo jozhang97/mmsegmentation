@@ -201,6 +201,8 @@ def main():
                 '``dataset.format_results()``.')
             print(f'\nwriting results to {args.out}')
             mmcv.dump(results, args.out)
+        if args.format_only:
+            dataset.format_all(results, **eval_kwargs)
         if args.eval:
             dataset.evaluate(results, args.eval, **eval_kwargs)
         if tmpdir is not None and eval_on_format_results:

@@ -1,7 +1,8 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import os.path as osp
 import warnings
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
+from pathlib import Path
 
 import mmcv
 import numpy as np
@@ -99,10 +100,13 @@ class UVODataset(Dataset):
         return img_infos
 
     def format_results(self, result, info):
+        result = 1.0 * result[0]
+        info = info[0].data[0][0]
+
         out = dict()
         out['bbox'] = info['pred_bbox']
         out['score'] = info['pred_score']
-        out['category_id'] = info['pred_category_id']
+        out['category_id'] = info.get('pred_category_id', 1)   # not sure why missing but 1
         out['image_id'] = info['image_id']
 
         crop_bbox = info['crop_bbox']
@@ -116,7 +120,19 @@ class UVODataset(Dataset):
         out['segmentation'] = transform_mask.encode(np.array(img[:, :, np.newaxis], dtype=np.uint8, order="F"))[0]
         out['segmentation']['counts'] = out['segmentation']['counts'].decode("utf-8")
 
-        return out
+        return [out]
+
+    def format_all(self, results, **kwargs):
+        fn2dets = defaultdict(list)
+        for det in results:
+            fn = Path(self.id2imgs[det['image_id']])
+            fn = str(fn.with_suffix('.json'))
+            fn2dets[fn].append(det)
+        outfile_prefix = kwargs.pop('jsonfile_prefix', '')
+        for fn, dets in fn2dets.items():
+            save_pth = outfile_prefix + fn
+            print(f'saving {len(dets)} dets to {save_pth}')
+            mmcv.dump(dets, save_pth)
 
     def pre_pipeline(self, results):
         """Prepare results dict for pipeline."""

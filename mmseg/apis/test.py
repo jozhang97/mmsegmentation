@@ -95,7 +95,7 @@ def single_gpu_test(model,
 
         if format_only:
             result = dataset.format_results(
-                result, indices=batch_indices, **format_args)
+                result, data['img_metas'])
         if pre_eval:
             # TODO: adapt samples_per_gpu > 1.
             # only samples_per_gpu=1 valid now
