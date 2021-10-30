@@ -78,6 +78,7 @@ class UVODataset(Dataset):
                 self.img_dir = osp.join(self.data_root, self.img_dir)
 
         # load annotations
+        print_log(f'Starting with {len(id2annos)} images', logger=get_root_logger())
         self.img_infos = self.load_annotations(self.proposals)
 
     def __len__(self):
@@ -96,7 +97,7 @@ class UVODataset(Dataset):
             img_infos.append(img_info)
         img_infos = sorted(img_infos, key=lambda x: x['filename'])
 
-        print_log(f'Loaded {len(img_infos)} images', logger=get_root_logger())
+        print_log(f'Loaded {len(img_infos)} proposals as images', logger=get_root_logger())
         return img_infos
 
     def format_results(self, result, info):
