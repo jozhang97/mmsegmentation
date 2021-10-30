@@ -110,7 +110,9 @@ def main():
 
     # build the dataloader
     # TODO: support multiple images per gpu (only minor changes are needed)
+    print('build dataset')
     dataset = build_dataset(cfg.data.test)
+    print('build dataloader')
     data_loader = build_dataloader(
         dataset,
         samples_per_gpu=1,
@@ -119,6 +121,7 @@ def main():
         shuffle=False)
 
     # build the model and load checkpoint
+    print('build model')
     cfg.model.train_cfg = None
     model = build_segmentor(cfg.model, test_cfg=cfg.get('test_cfg'))
     fp16_cfg = cfg.get('fp16', None)
@@ -164,6 +167,7 @@ def main():
     else:
         tmpdir = None
 
+    print('starting test')
     if not distributed:
         model = MMDataParallel(model, device_ids=[0])
         results = single_gpu_test(
